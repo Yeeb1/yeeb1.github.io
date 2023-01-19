@@ -1,6 +1,6 @@
 ---
 title: "HTB Writeup: Talkative [Hard]"
-summary: "A medium rated box, with flask session manipulation and privilege escalation trough mysql."
+summary: "A hard rated box, with a lot of container hopping and breakouts."
 tags: ["htb", "writeup", "hard"]
 #externalUrl: ""
 showSummary: true
