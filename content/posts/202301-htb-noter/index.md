@@ -10,7 +10,7 @@ draft: false
 # Noter
 ## Reconnaissance
 ### Nmap
-nmap scans three open ports ftp(21), ssh(22) and http_alt(5000) 
+```nmap``` scans three open ports ```ftp(21)```, ```ssh(22)``` and ```http_alt(5000)``` 
 ```
 ┌──(kali㉿kali)-[~/htb/noter]
 └─$ sudo nmap -A -T4 -sC -sV -p- 10.10.11.160
