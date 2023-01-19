@@ -1,6 +1,6 @@
 ---
 title: "HTB Writeup: Trick [Easy]"
-summary: "A medium rated box, with flask session manipulation and privilege escalation trough mysql."
+summary: "A easy rated box, with SQLi and privilege escalation trough fail2ban."
 tags: ["htb", "writeup", "easy"]
 #externalUrl: ""
 showSummary: true
