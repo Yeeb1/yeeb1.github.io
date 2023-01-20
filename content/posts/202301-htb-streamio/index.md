@@ -1,6 +1,6 @@
 ---
 title: "HTB Writeup: StreamIO [Medium]"
-summary: "A medium rated Windows box, with some Web vulnerabilities and domain privilege escaltion using Bloodhound."
+summary: "A medium rated Windows box, with some Web vulnerabilities and domain privilege escalation using Bloodhound."
 tags: ["htb", "writeup", "medium"]
 #externalUrl: ""
 showSummary: true
@@ -1749,5 +1749,5 @@ Info: Establishing connection to remote endpoint
 
 ```
 *Evil-WinRM* PS C:\Users\Martin\Desktop> type root.txt
-ee67d4d4b22f656ba328e0cf85bcc3e2
+[REDACTED]
 ```
