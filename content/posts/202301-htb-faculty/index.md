@@ -1,6 +1,6 @@
 ---
 title: "HTB Writeup: Faculty [Medium]"
-summary: "A medium rated box, with LFI and privilege escaltion trough gdb."
+summary: "A medium rated box, with LFI and privilege escalation trough gdb."
 tags: ["htb", "writeup", "medium"]
 #externalUrl: ""
 showSummary: true
